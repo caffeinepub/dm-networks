@@ -102,6 +102,7 @@ export interface SerializableUserProfile {
 }
 export interface PublicProfile {
     principal: Principal;
+    isVerified: boolean;
     profile: SerializableUserProfile;
 }
 export interface ChatMessage {
@@ -130,7 +131,9 @@ export interface backendInterface {
     getMemberDirectory(): Promise<Array<PublicProfile>>;
     getUserProfile(user: Principal): Promise<SerializableUserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
+    isUserVerified(user: Principal): Promise<boolean>;
     saveCallerUserProfile(profile: SerializableUserProfile): Promise<void>;
+    toggleVerifiedBadge(user: Principal): Promise<void>;
 }
 import type { ProfileVisibility as _ProfileVisibility, PublicProfile as _PublicProfile, SerializableUserProfile as _SerializableUserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
@@ -275,6 +278,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async isUserVerified(arg0: Principal): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.isUserVerified(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.isUserVerified(arg0);
+            return result;
+        }
+    }
     async saveCallerUserProfile(arg0: SerializableUserProfile): Promise<void> {
         if (this.processError) {
             try {
@@ -286,6 +303,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.saveCallerUserProfile(to_candid_SerializableUserProfile_n13(this._uploadFile, this._downloadFile, arg0));
+            return result;
+        }
+    }
+    async toggleVerifiedBadge(arg0: Principal): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.toggleVerifiedBadge(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.toggleVerifiedBadge(arg0);
             return result;
         }
     }
@@ -307,13 +338,16 @@ function from_candid_opt_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Ar
 }
 function from_candid_record_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     principal: Principal;
+    isVerified: boolean;
     profile: _SerializableUserProfile;
 }): {
     principal: Principal;
+    isVerified: boolean;
     profile: SerializableUserProfile;
 } {
     return {
         principal: value.principal,
+        isVerified: value.isVerified,
         profile: from_candid_SerializableUserProfile_n4(_uploadFile, _downloadFile, value.profile)
     };
 }

@@ -21,11 +21,12 @@ import {
 import { Send, RefreshCw, Loader2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/sonner';
-import { useAuthorDisplayName } from './useAuthorDisplayNames';
+import { useAuthorInfo } from './useAuthorDisplayNames';
 import type { ChatMessage } from '../../backend';
+import VerifiedBadge from '../../components/user/VerifiedBadge';
 
 function ChatMessageItem({ message, isAdmin }: { message: ChatMessage; isAdmin: boolean }) {
-  const displayName = useAuthorDisplayName(message.author);
+  const { displayName, isVerified } = useAuthorInfo(message.author);
   const { principal } = useAuth();
   const isOwnMessage = principal?.toString() === message.author.toString();
   const deleteMessage = useDeleteChatMessage();
@@ -57,46 +58,36 @@ function ChatMessageItem({ message, isAdmin }: { message: ChatMessage; isAdmin: 
 
   return (
     <>
-      <div className={`flex gap-3 group ${isOwnMessage ? 'flex-row-reverse' : ''}`}>
-        <Avatar className="h-10 w-10 shrink-0">
-          <AvatarFallback className={isOwnMessage ? 'bg-primary text-primary-foreground' : 'bg-muted'}>
+      <div className={`flex gap-3 ${isOwnMessage ? 'flex-row-reverse' : ''}`}>
+        <Avatar className="h-10 w-10 flex-shrink-0">
+          <AvatarFallback className="bg-primary/10 text-primary font-medium">
             {initials}
           </AvatarFallback>
         </Avatar>
-        <div className={`flex-1 space-y-1 ${isOwnMessage ? 'text-right' : ''}`}>
-          <div className="flex items-baseline gap-2">
-            <span className={`text-sm font-medium ${isOwnMessage ? 'order-2' : ''}`}>
-              {displayName}
-            </span>
-            <span className={`text-xs text-muted-foreground ${isOwnMessage ? 'order-1' : ''}`}>
-              {timeString}
-            </span>
-          </div>
-          <div className="flex items-start gap-2">
-            <div
-              className={`inline-block rounded-2xl px-4 py-2 max-w-[85%] break-words ${
-                isOwnMessage
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-foreground'
-              }`}
-            >
-              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-            </div>
+        <div className={`flex-1 space-y-1 ${isOwnMessage ? 'items-end' : ''}`}>
+          <div className={`flex items-center gap-2 ${isOwnMessage ? 'flex-row-reverse' : ''}`}>
+            <span className="text-sm font-medium">{displayName}</span>
+            {isVerified && <VerifiedBadge />}
+            <span className="text-xs text-muted-foreground">{timeString}</span>
             {isAdmin && (
               <Button
                 variant="ghost"
-                size="icon"
-                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                size="sm"
                 onClick={() => setShowDeleteDialog(true)}
-                disabled={deleteMessage.isPending}
+                className="h-6 w-6 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
               >
-                {deleteMessage.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                )}
+                <Trash2 className="h-3 w-3" />
               </Button>
             )}
+          </div>
+          <div
+            className={`rounded-lg px-4 py-2 inline-block max-w-[85%] ${
+              isOwnMessage
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted'
+            }`}
+          >
+            <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
           </div>
         </div>
       </div>
@@ -110,20 +101,12 @@ function ChatMessageItem({ message, isAdmin }: { message: ChatMessage; isAdmin: 
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteMessage.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              disabled={deleteMessage.isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleteMessage.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Deleting...
-                </>
-              ) : (
-                'Delete'
-              )}
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -132,42 +115,58 @@ function ChatMessageItem({ message, isAdmin }: { message: ChatMessage; isAdmin: 
   );
 }
 
-export default function ChatPage() {
-  const { isAuthenticated } = useAuth();
-  const { data: messages = [], isLoading, refetch, isFetching } = useChatMessages();
-  const { data: isAdmin = false } = useIsCallerAdmin();
+function ChatContent() {
+  const { data: messages, isLoading, refetch } = useChatMessages();
+  const { data: isAdmin } = useIsCallerAdmin();
   const createMessage = useCreateChatMessage();
-  const [messageContent, setMessageContent] = useState('');
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [newMessage, setNewMessage] = useState('');
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+  const previousMessageCount = useRef(0);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    if (shouldAutoScroll && scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    if (messages && messages.length > previousMessageCount.current && shouldAutoScroll) {
+      const scrollContainer = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      }
     }
+    previousMessageCount.current = messages?.length || 0;
   }, [messages, shouldAutoScroll]);
 
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.currentTarget;
-    const isAtBottom = target.scrollHeight - target.scrollTop - target.clientHeight < 50;
-    setShouldAutoScroll(isAtBottom);
-  };
+  // Detect if user has scrolled up
+  useEffect(() => {
+    const scrollContainer = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]');
+    if (!scrollContainer) return;
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!messageContent.trim()) {
-      return;
-    }
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
+      const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
+      setShouldAutoScroll(isAtBottom);
+    };
+
+    scrollContainer.addEventListener('scroll', handleScroll);
+    return () => scrollContainer.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim()) return;
 
     try {
-      await createMessage.mutateAsync(messageContent.trim());
-      setMessageContent('');
+      await createMessage.mutateAsync(newMessage.trim());
+      setNewMessage('');
       setShouldAutoScroll(true);
     } catch (error: any) {
       console.error('Failed to send message:', error);
       toast.error(error.message || 'Failed to send message. Please try again.');
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
     }
   };
 
@@ -176,92 +175,94 @@ export default function ChatPage() {
     toast.success('Messages refreshed');
   };
 
-  // Sort messages by timestamp (oldest first)
-  const sortedMessages = [...messages].sort((a, b) => 
-    Number(a.timestamp) - Number(b.timestamp)
-  );
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center space-y-3">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+          <p className="text-sm text-muted-foreground">Loading chat...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <Toaster />
-      <Card className="max-w-4xl mx-auto h-[calc(100vh-12rem)] md:h-[calc(100vh-10rem)] flex flex-col">
-        <CardHeader className="flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle className="text-xl">Live Chat</CardTitle>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleRefresh}
-            disabled={isFetching}
-            className="shrink-0"
-          >
-            <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
-          </Button>
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold">Live Chat</h1>
+          <p className="text-muted-foreground">Connect with other members in real-time</p>
+        </div>
+        <Button variant="outline" size="sm" onClick={handleRefresh}>
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Refresh
+        </Button>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Messages</CardTitle>
         </CardHeader>
-        <Separator />
-        <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
-          {/* Messages Area */}
-          <ScrollArea className="flex-1 p-4" onScrollCapture={handleScroll}>
-            <div ref={scrollRef} className="space-y-4">
-              {isLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="text-center space-y-3">
-                    <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-                    <p className="text-sm text-muted-foreground">Loading messages...</p>
-                  </div>
-                </div>
-              ) : sortedMessages.length === 0 ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="text-center space-y-2">
-                    <p className="text-muted-foreground">No messages yet</p>
-                    <p className="text-sm text-muted-foreground">
-                      {isAuthenticated
-                        ? 'Be the first to start the conversation!'
-                        : 'Sign in to start chatting'}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                sortedMessages.map((message) => (
-                  <ChatMessageItem key={message.id.toString()} message={message} isAdmin={isAdmin} />
+        <CardContent className="space-y-4">
+          <ScrollArea ref={scrollAreaRef} className="h-[500px] pr-4">
+            <div className="space-y-4">
+              {messages && messages.length > 0 ? (
+                messages.map((message) => (
+                  <ChatMessageItem
+                    key={message.id.toString()}
+                    message={message}
+                    isAdmin={isAdmin || false}
+                  />
                 ))
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p>No messages yet. Be the first to say hello!</p>
+                </div>
               )}
             </div>
           </ScrollArea>
 
-          {/* Message Input */}
-          <div className="border-t border-border p-4">
-            <AuthGate>
-              <form onSubmit={handleSendMessage} className="flex gap-2">
-                <Textarea
-                  value={messageContent}
-                  onChange={(e) => setMessageContent(e.target.value)}
-                  placeholder="Type your message..."
-                  rows={1}
-                  className="resize-none min-h-[44px] max-h-32"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSendMessage(e);
-                    }
-                  }}
-                />
-                <Button
-                  type="submit"
-                  size="icon"
-                  disabled={!messageContent.trim() || createMessage.isPending}
-                  className="shrink-0 h-11 w-11"
-                >
-                  {createMessage.isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Send className="h-4 w-4" />
-                  )}
-                </Button>
-              </form>
-            </AuthGate>
+          <Separator />
+
+          <div className="space-y-3">
+            <Textarea
+              placeholder="Type your message... (Shift+Enter for new line)"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              rows={3}
+              className="resize-none"
+            />
+            <div className="flex justify-end">
+              <Button
+                onClick={handleSendMessage}
+                disabled={!newMessage.trim() || createMessage.isPending}
+              >
+                {createMessage.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4 mr-2" />
+                    Send Message
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
-    </>
+    </div>
+  );
+}
+
+export default function ChatPage() {
+  return (
+    <AuthGate>
+      <Toaster />
+      <ChatContent />
+    </AuthGate>
   );
 }

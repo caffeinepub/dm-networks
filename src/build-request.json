@@ -1,111 +1,93 @@
 {
   "kind": "build_request",
-  "title": "Update public profile field labels and add phone/number field",
+  "title": "Admin-assigned verified badge for users (manual)",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-20",
-      "text": "Update the Profile page (public profile section) user-facing labels to match the new business-oriented wording: Skills → \"Business name\", Programming Languages → \"Slogan\", Current Projects → \"Business Description\", Activity Interests → \"Location\".",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "the profile page :\npublic profil titre : \nchange Skills to Business name\nProgrammming languages to Slogan\nCurrent Project  to business Description \nactivity interests to location"
-        ]
-      },
-      "acceptanceCriteria": [
-        "On the Profile page edit form, the labels for the public-only fields are updated exactly to: \"Business name\", \"Slogan\", \"Business Description\", and \"Location\".",
-        "Any helper text/placeholder text that explicitly references the old field meaning is updated to be consistent with the new label intent (business-oriented wording).",
-        "No other unrelated labels are changed."
-      ]
-    },
-    {
-      "id": "REQ-21",
-      "text": "Add a new \"Number\" (phone/number) field to the user profile model, collected and saved from the Profile page when the profile visibility is Public, and hidden/cleared when visibility is Private (consistent with other public-only fields).",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "add number"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend Candid types include the new profile field (e.g., a Text field) for storing the number.",
-        "The Profile form shows a new input labeled \"Number\" only when Profile Visibility is Public.",
-        "When switching visibility to Private and saving, the stored number value is cleared (empty string) similarly to other public-only fields.",
-        "Saving and reloading the profile preserves the number value for Public profiles."
-      ]
-    },
-    {
-      "id": "REQ-22",
-      "text": "Update profile validation to include the new \"Number\" field (only when visibility is Public) with reasonable constraints and an English validation error message when invalid.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "add number"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Profile validation is extended to validate the \"Number\" field only when visibility is Public.",
-        "If the number fails validation, the Profile form prevents save and displays an English error message near the field.",
-        "Existing validation behavior for other fields remains unchanged."
-      ]
-    },
-    {
-      "id": "REQ-23",
-      "text": "Update the Members Directory UI to display the renamed field labels for public profiles: \"Business name\", \"Slogan\", \"Business Description\", and \"Location\" (only when the corresponding values are present and the viewer is allowed to see them under existing visibility rules).",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "change Skills to Business name\nProgrammming languages to Slogan\nCurrent Project  to business Description \nactivity interests to location"
-        ]
-      },
-      "acceptanceCriteria": [
-        "In Members Directory cards, the label \"Skills\" is replaced with \"Business name\".",
-        "In Members Directory cards, the label \"Programming Languages\" is replaced with \"Slogan\".",
-        "In Members Directory cards, the label \"Current Projects\" is replaced with \"Business Description\".",
-        "In Members Directory cards, the label \"Activity Interests\" is replaced with \"Location\".",
-        "Private profile behavior remains unchanged (public-only fields are not shown)."
-      ]
-    },
-    {
-      "id": "REQ-24",
-      "text": "Update backend privacy filtering logic (getUserProfile and getMemberDirectory) to ensure the new number field is treated as public-only data: owner/admin can see it always; other users can see it only when the profile is Public; and it is blanked when returning a Private profile to non-owners.",
+      "id": "REQ-25",
+      "text": "Add backend support for a manual, administrator-assigned \"Verified\" user badge that can be toggled on/off per user principal and cannot be self-assigned by normal users.",
       "target": "backend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-6"
         ],
         "quotes": [
-          "add number"
+          "je veux pouvoir attribuer des badges aux utlisateurs vérifé. c'est une option manuelle"
         ]
       },
       "acceptanceCriteria": [
-        "For Private profiles viewed by a non-owner non-admin, the returned profile has the number field set to an empty string (not leaked).",
-        "For Public profiles viewed by another user, the returned profile includes the number field value.",
-        "Owner/admin views return the stored number value regardless of visibility setting."
+        "Backend stores a per-user \"Verified\" badge state keyed by Principal (default: not verified).",
+        "An admin-only update method exists to set/unset the Verified badge for a target Principal; non-admin callers are rejected with an authorization error.",
+        "A read method exists to retrieve whether a given Principal is verified (usable by the frontend for rendering badges)."
+      ]
+    },
+    {
+      "id": "REQ-26",
+      "text": "Expose verified badge information in existing directory/profile read flows so the frontend can display it without breaking privacy rules (badge visibility is not restricted by profile visibility).",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "je veux pouvoir attribuer des badges aux utlisateurs vérifé. c'est une option manuelle"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Members directory entries include verified status for each returned principal.",
+        "User-profile reads for a given principal provide verified status for that principal (even when the profile itself is private to the viewer).",
+        "Existing profile visibility filtering (public vs private fields and number clearing) continues to behave exactly as before; only the badge is additionally available."
+      ]
+    },
+    {
+      "id": "REQ-27",
+      "text": "Add React Query hooks for (1) reading verified badge status and (2) admin-only toggling of a user’s verified badge, using the authenticated actor and invalidating affected caches.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "je veux pouvoir attribuer des badges aux utlisateurs vérifé. c'est une option manuelle"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A query hook exists to fetch verified status for a given Principal (or uses verified status included in the members directory response).",
+        "A mutation hook exists to set/unset verified status for a given Principal and handles loading/error states.",
+        "On success, relevant queries are invalidated so the Members directory and any cached user profile lookups refresh (e.g., invalidate memberDirectory, userProfile, and chat-related author lookups if applicable)."
+      ]
+    },
+    {
+      "id": "REQ-28",
+      "text": "Display a \"Verified\" badge in the UI wherever user identity is shown, and provide an admin-only manual control to toggle it from the Members Directory.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "je veux pouvoir attribuer des badges aux utlisateurs vérifé. c'est une option manuelle"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Members Directory: verified users show a clear \"Verified\" badge next to the display name (English label: \"Verified\").",
+        "Live Chat: when rendering each message author, show a \"Verified\" badge next to the author display name when that author is verified.",
+        "Members Directory: if the signed-in user is an admin, each member card includes a manual control to set/unset the member’s Verified badge; non-admins do not see the control.",
+        "Admin toggle action shows sensible loading/disabled states and an English error toast/message if it fails."
       ]
     }
   ],
   "constraints": [
+    "Use English for all user-facing text (e.g., badge label \"Verified\", errors, button labels).",
     "Backend must remain a single Motoko actor in backend/main.mo; do not introduce additional backend services.",
-    "Do not edit any files under frontend/src/components/ui or any other frontend immutablePaths listed in SYSTEM_CONTEXT; compose existing UI components instead.",
-    "Use English for all user-facing text (labels, headings, validation errors)."
+    "Do not edit frontend files under frontend/src/components/ui or other immutablePaths; compose existing UI components instead.",
+    "Do not use WebSockets or real-time subscriptions; keep existing polling approach for chat.",
+    "Preserve existing profile visibility rules and the existing \"Number\" field privacy behavior."
   ],
   "nonGoals": [
-    "Do not add third-party authentication methods (only Internet Identity is supported).",
-    "Do not add new pages or navigation items beyond updating the existing Profile and Members pages.",
-    "Do not implement real-time updates via WebSockets."
+    "Automatic verification logic (e.g., based on phone/email/domain) is out of scope; verification is manual only.",
+    "Third-party verification services or external databases are out of scope.",
+    "A full admin dashboard page is out of scope unless required to support the Members page manual toggle."
   ],
   "imageRequirements": {
     "required": [],

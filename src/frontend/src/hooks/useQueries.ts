@@ -130,3 +130,36 @@ export function useMemberDirectory() {
     staleTime: 30000, // Cache for 30 seconds
   });
 }
+
+// Verified Badge Queries
+export function useIsUserVerified(principal: Principal | undefined) {
+  const { actor, isFetching: actorFetching } = useActor();
+
+  return useQuery<boolean>({
+    queryKey: ['userVerified', principal?.toString()],
+    queryFn: async () => {
+      if (!actor || !principal) return false;
+      return actor.isUserVerified(principal);
+    },
+    enabled: !!actor && !actorFetching && !!principal,
+    staleTime: 60000, // Cache for 1 minute
+  });
+}
+
+export function useToggleVerifiedBadge() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (user: Principal) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.toggleVerifiedBadge(user);
+    },
+    onSuccess: () => {
+      // Invalidate all relevant queries to refresh UI
+      queryClient.invalidateQueries({ queryKey: ['memberDirectory'] });
+      queryClient.invalidateQueries({ queryKey: ['userVerified'] });
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+    },
+  });
+}

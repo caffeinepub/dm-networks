@@ -1,77 +1,53 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Update Profile & Members labels; add public-only Number field (frontend)",
+  "title": "Manual Verified badge UI + admin toggle (frontend)",
   "requirements": [
     {
-      "id": "REQ-20",
-      "summary": "Update Profile page edit-form labels/placeholders for public profile fields to business-oriented wording.",
+      "id": "REQ-27",
+      "summary": "Add React Query hooks to read and admin-toggle a user’s Verified badge, using the authenticated actor and invalidating relevant caches.",
       "acceptanceCriteria": [
-        "On the Profile page edit form, the labels for the public-only fields are updated exactly to: \"Business name\", \"Slogan\", \"Business Description\", and \"Location\".",
-        "Any helper text/placeholder text that explicitly references the old field meaning is updated to be consistent with the new label intent (business-oriented wording).",
-        "No other unrelated labels are changed."
+        "A query hook exists to fetch verified status for a given Principal (or uses verified status included in the members directory response).",
+        "A mutation hook exists to set/unset verified status for a given Principal and handles loading/error states.",
+        "On success, relevant queries are invalidated so the Members directory and any cached user profile lookups refresh (e.g., invalidate memberDirectory, userProfile, and chat-related author lookups if applicable)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/features/profile/ProfileForm.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Update the public-only field labels: Skills→\"Business name\", Programming Languages→\"Slogan\", Current Projects→\"Business Description\", Activity Interests→\"Location\"; update any related placeholder/help text to match the new business-oriented intent while leaving unrelated labels unchanged."
+          "description": "Add React Query hooks for verified badges: (1) a query hook to read verified status for a Principal via the authenticated actor, and/or a helper that can derive status from cached Members Directory data; (2) an admin-only mutation hook that toggles a user’s Verified badge via the actor and exposes loading/error states. Ensure on success that cached queries are invalidated so UI refreshes (memberDirectory, userProfile, and any chat/author-related lookups as applicable). Use the existing authorization/authenticated-actor flow from the selected \"authorization\" component (role-based access control expectations); Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-21",
-      "summary": "Add a new public-only \"Number\" field to the Profile form, saved only for Public visibility and cleared when Private.",
+      "id": "REQ-28",
+      "summary": "Show a Verified badge wherever user identity is displayed and add an admin-only toggle control on Members Directory cards with proper UX and error handling.",
       "acceptanceCriteria": [
-        "Backend Candid types include the new profile field (e.g., a Text field) for storing the number.",
-        "The Profile form shows a new input labeled \"Number\" only when Profile Visibility is Public.",
-        "When switching visibility to Private and saving, the stored number value is cleared (empty string) similarly to other public-only fields.",
-        "Saving and reloading the profile preserves the number value for Public profiles."
+        "Members Directory: verified users show a clear \"Verified\" badge next to the display name (English label: \"Verified\").",
+        "Live Chat: when rendering each message author, show a \"Verified\" badge next to the author display name when that author is verified.",
+        "Members Directory: if the signed-in user is an admin, each member card includes a manual control to set/unset the member’s Verified badge; non-admins do not see the control.",
+        "Admin toggle action shows sensible loading/disabled states and an English error toast/message if it fails."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/features/profile/ProfileForm.tsx",
-          "operation": "modify",
-          "description": "Add a new controlled input labeled \"Number\" within the public-only section; bind it to profile state initialized from the loaded profile, include it in the saved UserProfile payload when visibility is Public, and send an empty string when visibility is Private to ensure it is cleared consistently with other public-only fields."
-        }
-      ]
-    },
-    {
-      "id": "REQ-22",
-      "summary": "Extend profile validation to validate the new public-only \"Number\" field and show an English error near the field on failure.",
-      "acceptanceCriteria": [
-        "Profile validation is extended to validate the \"Number\" field only when visibility is Public.",
-        "If the number fails validation, the Profile form prevents save and displays an English error message near the field.",
-        "Existing validation behavior for other fields remains unchanged."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/features/profile/validateProfile.ts",
-          "operation": "modify",
-          "description": "Extend validation inputs and returned error shape to include a \"number\" field; validate only for public visibility with reasonable constraints (e.g., allowed characters and length) and return an English error message when invalid, without changing existing validation behavior for other fields."
+          "path": "frontend/src/components/user/VerifiedBadge.tsx",
+          "operation": "create",
+          "description": "Create a small presentational \"Verified\" badge component (English label: \"Verified\") composed from existing shadcn/ui primitives (e.g., Badge) and optional iconography, without editing any immutable ui components. Verify the component's usage instructions before implementing."
         },
-        {
-          "path": "frontend/src/features/profile/ProfileForm.tsx",
-          "operation": "modify",
-          "description": "Wire the new \"Number\" value into validateProfile() calls and display any returned validation error message near the \"Number\" field; ensure save is prevented when validation fails."
-        }
-      ]
-    },
-    {
-      "id": "REQ-23",
-      "summary": "Update Members Directory cards to show the renamed public-profile labels for the existing public-only fields.",
-      "acceptanceCriteria": [
-        "In Members Directory cards, the label \"Skills\" is replaced with \"Business name\".",
-        "In Members Directory cards, the label \"Programming Languages\" is replaced with \"Slogan\".",
-        "In Members Directory cards, the label \"Current Projects\" is replaced with \"Business Description\".",
-        "In Members Directory cards, the label \"Activity Interests\" is replaced with \"Location\".",
-        "Private profile behavior remains unchanged (public-only fields are not shown)."
-      ],
-      "file_operations": [
         {
           "path": "frontend/src/features/members/MembersPage.tsx",
           "operation": "modify",
-          "description": "Replace the Members Directory card labels for the four public-only fields to the new wording (Business name/Slogan/Business Description/Location) while preserving existing visibility behavior so private profiles do not display public-only fields."
+          "description": "Update member cards to render the new VerifiedBadge next to the display name when the directory entry indicates the member is verified. Add an admin-only manual control on each member card (using existing isCallerAdmin query state and the new toggle mutation hook) to toggle verified status, with sensible disabled/loading states. On failure, show an English error toast/message and keep non-admins from seeing any toggle control. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/features/chat/useAuthorDisplayNames.ts",
+          "operation": "modify",
+          "description": "Extend the author identity helper(s) to also provide verified status for a given author (e.g., by calling the new verified-status query hook) so chat rendering can decide whether to show VerifiedBadge next to the author display name. Keep behavior consistent with existing profile visibility rules (badge display should not depend on profile visibility). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/features/chat/ChatPage.tsx",
+          "operation": "modify",
+          "description": "When rendering each message author, display the VerifiedBadge next to the author display name whenever the author is verified, using the updated author identity helper(s). Ensure no real-time subscriptions are introduced (keep existing polling). Verify the component's usage instructions before implementing."
         }
       ]
     }

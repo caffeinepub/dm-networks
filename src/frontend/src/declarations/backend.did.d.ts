@@ -20,6 +20,7 @@ export type ProfileVisibility = { 'privateVisibility' : null } |
   { 'publicVisibility' : null };
 export interface PublicProfile {
   'principal' : Principal,
+  'isVerified' : boolean,
   'profile' : SerializableUserProfile,
 }
 export interface SerializableUserProfile {
@@ -47,7 +48,9 @@ export interface _SERVICE {
   'getMemberDirectory' : ActorMethod<[], Array<PublicProfile>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [SerializableUserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  'isUserVerified' : ActorMethod<[Principal], boolean>,
   'saveCallerUserProfile' : ActorMethod<[SerializableUserProfile], undefined>,
+  'toggleVerifiedBadge' : ActorMethod<[Principal], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

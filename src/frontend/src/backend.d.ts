@@ -20,6 +20,7 @@ export interface SerializableUserProfile {
 }
 export interface PublicProfile {
     principal: Principal;
+    isVerified: boolean;
     profile: SerializableUserProfile;
 }
 export interface ChatMessage {
@@ -47,5 +48,7 @@ export interface backendInterface {
     getMemberDirectory(): Promise<Array<PublicProfile>>;
     getUserProfile(user: Principal): Promise<SerializableUserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
+    isUserVerified(user: Principal): Promise<boolean>;
     saveCallerUserProfile(profile: SerializableUserProfile): Promise<void>;
+    toggleVerifiedBadge(user: Principal): Promise<void>;
 }

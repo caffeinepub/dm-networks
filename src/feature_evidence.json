@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-profile-page-public-profile-section-user-facing-labels-to-match-the-new-business-oriented-wording-skills-business-name-programming-languages-slogan-current-projects-business-description-activity-interests-location",
-      "featureTitle": "Update the Profile page (public profile section) user-facing labels to match the new business-oriented wording: Skills → \"Business name\", Programming Languages → \"Slogan\", Current Projects → \"Business Description\", Activity Interests → \"Location\".",
+      "featureId": "feature-add-react-query-hooks-for-1-reading-verified-badge-status-and-2-admin-only-toggling-of-a-user-s-verified-badge-using-the-authenticated-actor-and-invalidating-affected-caches",
+      "featureTitle": "Add React Query hooks for (1) reading verified badge status and (2) admin-only toggling of a user’s verified badge, using the authenticated actor and invalidating affected caches.",
       "files": [
-        "frontend/src/features/profile/ProfileForm.tsx"
+        "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -16,53 +16,17 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-20"
+        "REQ-27"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-a-new-number-phone-number-field-to-the-user-profile-model-collected-and-saved-from-the-profile-page-when-the-profile-visibility-is-public-and-hidden-cleared-when-visibility-is-private-consistent-with-other-public-only-fields",
-      "featureTitle": "Add a new \"Number\" (phone/number) field to the user profile model, collected and saved from the Profile page when the profile visibility is Public, and hidden/cleared when visibility is Private (consistent with other public-only fields).",
+      "featureId": "feature-display-a-verified-badge-in-the-ui-wherever-user-identity-is-shown-and-provide-an-admin-only-manual-control-to-toggle-it-from-the-members-directory",
+      "featureTitle": "Display a \"Verified\" badge in the UI wherever user identity is shown, and provide an admin-only manual control to toggle it from the Members Directory.",
       "files": [
-        "frontend/src/features/profile/ProfileForm.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-21"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-profile-validation-to-include-the-new-number-field-only-when-visibility-is-public-with-reasonable-constraints-and-an-english-validation-error-message-when-invalid",
-      "featureTitle": "Update profile validation to include the new \"Number\" field (only when visibility is Public) with reasonable constraints and an English validation error message when invalid.",
-      "files": [
-        "frontend/src/features/profile/ProfileForm.tsx",
-        "frontend/src/features/profile/validateProfile.ts"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-22"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-the-members-directory-ui-to-display-the-renamed-field-labels-for-public-profiles-business-name-slogan-business-description-and-location-only-when-the-corresponding-values-are-present-and-the-viewer-is-allowed-to-see-them-under-existing-visibility-rules",
-      "featureTitle": "Update the Members Directory UI to display the renamed field labels for public profiles: \"Business name\", \"Slogan\", \"Business Description\", and \"Location\" (only when the corresponding values are present and the viewer is allowed to see them under existing visibility rules).",
-      "files": [
+        "frontend/src/components/user/VerifiedBadge.tsx",
+        "frontend/src/features/chat/ChatPage.tsx",
+        "frontend/src/features/chat/useAuthorDisplayNames.ts",
         "frontend/src/features/members/MembersPage.tsx"
       ],
       "components": [
@@ -74,7 +38,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-23"
+        "REQ-28"
       ],
       "confidence": "high"
     }

@@ -36,6 +36,7 @@ export const ChatMessage = IDL.Record({
 });
 export const PublicProfile = IDL.Record({
   'principal' : IDL.Principal,
+  'isVerified' : IDL.Bool,
   'profile' : SerializableUserProfile,
 });
 
@@ -58,7 +59,9 @@ export const idlService = IDL.Service({
       ['query'],
     ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'isUserVerified' : IDL.Func([IDL.Principal], [IDL.Bool], ['query']),
   'saveCallerUserProfile' : IDL.Func([SerializableUserProfile], [], []),
+  'toggleVerifiedBadge' : IDL.Func([IDL.Principal], [], []),
 });
 
 export const idlInitArgs = [];
@@ -92,6 +95,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const PublicProfile = IDL.Record({
     'principal' : IDL.Principal,
+    'isVerified' : IDL.Bool,
     'profile' : SerializableUserProfile,
   });
   
@@ -114,7 +118,9 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'isUserVerified' : IDL.Func([IDL.Principal], [IDL.Bool], ['query']),
     'saveCallerUserProfile' : IDL.Func([SerializableUserProfile], [], []),
+    'toggleVerifiedBadge' : IDL.Func([IDL.Principal], [], []),
   });
 };
 

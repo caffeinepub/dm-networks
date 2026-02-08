@@ -6,8 +6,10 @@ import Time "mo:core/Time";
 import Iter "mo:core/Iter";
 import MixinAuthorization "authorization/MixinAuthorization";
 import Migration "migration";
+
 import AccessControl "authorization/access-control";
 
+// Data migration support for persistent `verifiedUsers` map
 (with migration = Migration.run)
 actor {
   let accessControlState = AccessControl.initState();
@@ -33,6 +35,7 @@ actor {
   public type PublicProfile = {
     principal : Principal;
     profile : SerializableUserProfile;
+    isVerified : Bool;
   };
 
   public type ChatMessage = {
@@ -43,6 +46,8 @@ actor {
   };
 
   let userProfiles = Map.empty<Principal, SerializableUserProfile>();
+  let verifiedUsers = Map.empty<Principal, Bool>();
+
   var chatMessages = Map.empty<Nat, ChatMessage>();
   var nextMessageId = 0;
 
@@ -140,11 +145,12 @@ actor {
     userProfiles.entries().toArray().map(
       func((principal, profile)) : PublicProfile {
         // Owner or admin sees full profile
+        let hasVerifiedBadge = verifiedUsers.get(principal) == ?true;
         if (principal == caller or isAdmin) {
-          { principal; profile };
+          { principal; profile; isVerified = hasVerifiedBadge };
         } else if (profile.visibility == #publicVisibility) {
           // Public profiles are fully visible
-          { principal; profile };
+          { principal; profile; isVerified = hasVerifiedBadge };
         } else {
           // Private profiles: show only basic information and exclude number
           {
@@ -160,9 +166,31 @@ actor {
               programmingLanguages = "";
               number = "";
             };
+            isVerified = hasVerifiedBadge;
           };
         };
       }
     );
+  };
+
+  public shared ({ caller }) func toggleVerifiedBadge(user : Principal) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admins can assign verified badges");
+    };
+
+    let currentlyVerified = switch (verifiedUsers.get(user)) {
+      case (null) { false };
+      case (?value) { value };
+    };
+
+    let newVerificationStatus = not currentlyVerified;
+    verifiedUsers.add(user, newVerificationStatus);
+  };
+
+  public query ({ caller }) func isUserVerified(user : Principal) : async Bool {
+    switch (verifiedUsers.get(user)) {
+      case (null) { false };
+      case (?value) { value };
+    };
   };
 };

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useGetUserProfile } from '../../hooks/useQueries';
+import { useGetUserProfile, useIsUserVerified } from '../../hooks/useQueries';
 import type { Principal } from '@dfinity/principal';
 
 export function useAuthorDisplayName(author: Principal) {
@@ -13,3 +13,15 @@ export function useAuthorDisplayName(author: Principal) {
   }, [profile]);
 }
 
+export function useAuthorInfo(author: Principal) {
+  const { data: profile } = useGetUserProfile(author);
+  const { data: isVerified } = useIsUserVerified(author);
+  
+  return useMemo(() => {
+    const displayName = profile?.displayName || 'Anonymous User';
+    return {
+      displayName,
+      isVerified: isVerified || false,
+    };
+  }, [profile, isVerified]);
+}

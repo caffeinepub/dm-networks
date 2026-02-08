@@ -1,9 +1,10 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 13,
+  "projectStateVersion": 15,
   "summary": "DM Networks: a live chat app where users can interact with other users and create a simple profile (display name, bio, social media links), with clear in-app explanation of how the project works and branding/attribution that it is managed by DMC Technologies (https://www.dmc-technologies.fr).",
   "architectural_notes": [
-    "Introduce an admin/moderator authorization concept for chat moderation actions (e.g., delete message) and for assigning user badges."
+    "Introduce an admin/moderator authorization concept for chat moderation actions (e.g., delete message) and for assigning user badges.",
+    "“Confirmed/verified user” badges are assigned manually by an administrator/moderator (no automatic verification workflow)."
   ],
   "known_issues": [],
   "isFixRequest": false,
@@ -143,6 +144,22 @@
         "REQ-23"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-react-query-hooks-for-1-reading-verified-badge-status-and-2-admin-only-toggling-of-a-user-s-verified-badge-using-the-authenticated-actor-and-invalidating-affected-caches",
+      "title": "Add React Query hooks for (1) reading verified badge status and (2) admin-only toggling of a user’s verified badge, using the authenticated actor and invalidating affected caches.",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-display-a-verified-badge-in-the-ui-wherever-user-identity-is-shown-and-provide-an-admin-only-manual-control-to-toggle-it-from-the-members-directory",
+      "title": "Display a \"Verified\" badge in the UI wherever user identity is shown, and provide an admin-only manual control to toggle it from the Members Directory.",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -253,6 +270,22 @@
       "summary": "Update backend privacy filtering logic (getUserProfile and getMemberDirectory) to ensure the new number field is treated as public-only data: owner/admin can see it always; other users can see it only when the profile is Public; and it is blanked when returning a Private profile to non-owners.",
       "reqIds": [
         "REQ-24"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-21",
+      "summary": "Add backend support for a manual, administrator-assigned \"Verified\" user badge that can be toggled on/off per user principal and cannot be self-assigned by normal users.",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-22",
+      "summary": "Expose verified badge information in existing directory/profile read flows so the frontend can display it without breaking privacy rules (badge visibility is not restricted by profile visibility).",
+      "reqIds": [
+        "REQ-26"
       ],
       "status": "pending"
     }

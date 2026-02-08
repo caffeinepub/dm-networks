@@ -1,19 +1,24 @@
 import { useState, useMemo } from 'react';
 import AuthGate from '../../components/auth/AuthGate';
-import { useMemberDirectory } from '../../hooks/useQueries';
+import { useMemberDirectory, useIsCallerAdmin, useToggleVerifiedBadge } from '../../hooks/useQueries';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Search, Users, Link as LinkIcon, AlertCircle, Lock, Code, Briefcase, Target, Lightbulb, Phone, MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Search, Users, Link as LinkIcon, AlertCircle, Lock, Briefcase, Target, Lightbulb, Phone, MapPin, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { ProfileVisibility } from '../../backend';
+import VerifiedBadge from '../../components/user/VerifiedBadge';
+import { toast } from 'sonner';
+import { Toaster } from '@/components/ui/sonner';
 
 export default function MembersPage() {
   return (
     <AuthGate>
+      <Toaster />
       <MembersContent />
     </AuthGate>
   );
@@ -21,6 +26,7 @@ export default function MembersPage() {
 
 function MembersContent() {
   const { data: members, isLoading, error } = useMemberDirectory();
+  const { data: isAdmin } = useIsCallerAdmin();
   const [nameSearch, setNameSearch] = useState('');
   const [bioSearch, setBioSearch] = useState('');
   const [hasSocialLinksFilter, setHasSocialLinksFilter] = useState(false);
@@ -176,131 +182,182 @@ function MembersContent() {
             Showing {filteredMembers.length} {filteredMembers.length === 1 ? 'member' : 'members'}
           </p>
           <div className="grid gap-6 md:grid-cols-2">
-            {filteredMembers.map((member) => {
-              const profile = member.profile;
-              const isPrivate = profile.visibility === ProfileVisibility.privateVisibility;
-              const hasBusinessInfo =
-                !isPrivate &&
-                (profile.skills ||
-                  profile.programmingLanguages ||
-                  profile.currentProjects ||
-                  profile.activityInterests ||
-                  profile.number);
-
-              return (
-                <Card key={member.principal.toString()} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <CardTitle className="text-xl truncate">{profile.displayName}</CardTitle>
-                        {isPrivate && (
-                          <Badge variant="secondary" className="mt-2 gap-1">
-                            <Lock className="h-3 w-3" />
-                            Private
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {/* Bio */}
-                    {profile.bio && (
-                      <p className="text-sm text-muted-foreground line-clamp-3">{profile.bio}</p>
-                    )}
-
-                    {/* Social Links */}
-                    {profile.socialLinks && profile.socialLinks.length > 0 && (
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm font-medium">
-                          <LinkIcon className="h-4 w-4" />
-                          Social Links
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {profile.socialLinks.map((link, index) => (
-                            <a
-                              key={index}
-                              href={link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-primary hover:underline truncate max-w-full"
-                            >
-                              {link}
-                            </a>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Business Information - Only for public profiles with data */}
-                    {hasBusinessInfo && (
-                      <>
-                        <Separator />
-                        <div className="space-y-3">
-                          {profile.skills && (
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2 text-sm font-medium">
-                                <Briefcase className="h-4 w-4" />
-                                Business name
-                              </div>
-                              <p className="text-sm text-muted-foreground pl-6">{profile.skills}</p>
-                            </div>
-                          )}
-
-                          {profile.programmingLanguages && (
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2 text-sm font-medium">
-                                <Lightbulb className="h-4 w-4" />
-                                Slogan
-                              </div>
-                              <p className="text-sm text-muted-foreground pl-6">
-                                {profile.programmingLanguages}
-                              </p>
-                            </div>
-                          )}
-
-                          {profile.currentProjects && (
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2 text-sm font-medium">
-                                <Target className="h-4 w-4" />
-                                Business Description
-                              </div>
-                              <p className="text-sm text-muted-foreground pl-6 line-clamp-3">
-                                {profile.currentProjects}
-                              </p>
-                            </div>
-                          )}
-
-                          {profile.activityInterests && (
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2 text-sm font-medium">
-                                <MapPin className="h-4 w-4" />
-                                Location
-                              </div>
-                              <p className="text-sm text-muted-foreground pl-6 line-clamp-2">
-                                {profile.activityInterests}
-                              </p>
-                            </div>
-                          )}
-
-                          {profile.number && (
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2 text-sm font-medium">
-                                <Phone className="h-4 w-4" />
-                                Number
-                              </div>
-                              <p className="text-sm text-muted-foreground pl-6">{profile.number}</p>
-                            </div>
-                          )}
-                        </div>
-                      </>
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            })}
+            {filteredMembers.map((member) => (
+              <MemberCard key={member.principal.toString()} member={member} isAdmin={isAdmin || false} />
+            ))}
           </div>
         </div>
       )}
     </div>
+  );
+}
+
+function MemberCard({ member, isAdmin }: { member: any; isAdmin: boolean }) {
+  const profile = member.profile;
+  const isPrivate = profile.visibility === ProfileVisibility.privateVisibility;
+  const toggleVerified = useToggleVerifiedBadge();
+  const [isToggling, setIsToggling] = useState(false);
+
+  const hasBusinessInfo =
+    !isPrivate &&
+    (profile.skills ||
+      profile.programmingLanguages ||
+      profile.currentProjects ||
+      profile.activityInterests ||
+      profile.number);
+
+  const handleToggleVerified = async () => {
+    setIsToggling(true);
+    try {
+      await toggleVerified.mutateAsync(member.principal);
+      toast.success(
+        member.isVerified
+          ? 'Verified badge removed successfully'
+          : 'Verified badge assigned successfully'
+      );
+    } catch (error: any) {
+      console.error('Failed to toggle verified badge:', error);
+      toast.error(error.message || 'Failed to update verified status. Please try again.');
+    } finally {
+      setIsToggling(false);
+    }
+  };
+
+  return (
+    <Card className="hover:shadow-lg transition-shadow">
+      <CardHeader>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0 space-y-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <CardTitle className="text-xl truncate">{profile.displayName}</CardTitle>
+              {member.isVerified && <VerifiedBadge />}
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              {isPrivate && (
+                <Badge variant="secondary" className="gap-1">
+                  <Lock className="h-3 w-3" />
+                  Private
+                </Badge>
+              )}
+            </div>
+          </div>
+        </div>
+        {isAdmin && (
+          <div className="pt-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleToggleVerified}
+              disabled={isToggling}
+              className="w-full"
+            >
+              {isToggling ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Updating...
+                </>
+              ) : member.isVerified ? (
+                'Remove Verified Badge'
+              ) : (
+                'Assign Verified Badge'
+              )}
+            </Button>
+          </div>
+        )}
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Bio */}
+        {profile.bio && (
+          <p className="text-sm text-muted-foreground line-clamp-3">{profile.bio}</p>
+        )}
+
+        {/* Social Links */}
+        {profile.socialLinks && profile.socialLinks.length > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <LinkIcon className="h-4 w-4" />
+              Social Links
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {profile.socialLinks.map((link, index) => (
+                <a
+                  key={index}
+                  href={link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-primary hover:underline truncate max-w-full"
+                >
+                  {link}
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Business Information - Only for public profiles with data */}
+        {hasBusinessInfo && (
+          <>
+            <Separator />
+            <div className="space-y-3">
+              {profile.skills && (
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <Briefcase className="h-4 w-4" />
+                    Business name
+                  </div>
+                  <p className="text-sm text-muted-foreground pl-6">{profile.skills}</p>
+                </div>
+              )}
+
+              {profile.programmingLanguages && (
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <Lightbulb className="h-4 w-4" />
+                    Slogan
+                  </div>
+                  <p className="text-sm text-muted-foreground pl-6">
+                    {profile.programmingLanguages}
+                  </p>
+                </div>
+              )}
+
+              {profile.currentProjects && (
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <Target className="h-4 w-4" />
+                    Business Description
+                  </div>
+                  <p className="text-sm text-muted-foreground pl-6 line-clamp-3">
+                    {profile.currentProjects}
+                  </p>
+                </div>
+              )}
+
+              {profile.activityInterests && (
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <MapPin className="h-4 w-4" />
+                    Location
+                  </div>
+                  <p className="text-sm text-muted-foreground pl-6 line-clamp-2">
+                    {profile.activityInterests}
+                  </p>
+                </div>
+              )}
+
+              {profile.number && (
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <Phone className="h-4 w-4" />
+                    Number
+                  </div>
+                  <p className="text-sm text-muted-foreground pl-6">{profile.number}</p>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 }

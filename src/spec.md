@@ -1,13 +1,13 @@
 # Specification
 
 ## Summary
-**Goal:** Update public profile wording to business-oriented labels and add a public-only “Number” field that is saved, validated, and privacy-filtered consistently across Profile and Members Directory.
+**Goal:** Add a manual, admin-assigned “Verified” badge for users and display it across the app.
 
 **Planned changes:**
-- Update Profile page public profile field labels to: “Business name”, “Slogan”, “Business Description”, and “Location”, including any related helper/placeholder text that references the old meanings.
-- Add a new “Number” field to the user profile model, editable from the Profile page only when Profile Visibility is Public, and cleared when switching to Private and saving.
-- Extend Profile form validation to validate “Number” only for Public profiles and show an English error message when invalid.
-- Update Members Directory UI to display the renamed labels for public profile fields (when values are present and allowed by existing visibility rules).
-- Update backend privacy filtering (getUserProfile and getMemberDirectory) so “Number” is treated as public-only: always visible to owner/admin, visible to others only when Public, and blanked for Private profiles returned to non-owners.
+- Backend: store a per-Principal Verified state (default off) and expose read access for verified status.
+- Backend: add an admin-only method to set/unset a user’s Verified status, rejecting non-admin callers.
+- Backend: include verified status in existing members directory and user-profile read responses without changing existing profile privacy/visibility behavior (badge always visible).
+- Frontend: add React Query hooks to read verified status and to admin-toggle it, with appropriate cache invalidation.
+- Frontend: show a “Verified” badge next to user names in Members Directory and Live Chat; add an admin-only toggle control on member cards with loading/disabled states and English error messaging.
 
-**User-visible outcome:** Users can present a business-oriented public profile with updated labels and an optional public “Number” field; the Members Directory reflects the new labels, and the number is only visible according to profile visibility and viewer permissions.
+**User-visible outcome:** Verified users are clearly labeled “Verified” wherever their identity appears (directory and chat), and admins can manually turn the badge on/off for any user from the Members Directory.
