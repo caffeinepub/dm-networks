@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 5,
+  "summary": "DM Networks: a live chat app where users can interact with other users and create a simple profile (display name, bio, social media links), with clear in-app explanation of how the project works and branding/attribution that it is managed by DMC Technologies (https://www.dmc-technologies.fr).",
+  "architectural_notes": [],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-add-internet-identity-authentication-so-users-can-sign-in-out-and-the-app-can-identify-the-current-user-principal-for-all-profile-and-chat-actions",
+      "title": "Add Internet Identity authentication so users can sign in/out and the app can identify the current user principal for all profile and chat actions.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-user-profiles-with-fields-display-name-bio-and-social-media-links-stored-per-user-keyed-by-principal-in-the-motoko-backend-with-frontend-screens-to-create-and-edit-the-profile",
+      "title": "Implement user profiles with fields: display name, bio, and social media links, stored per-user (keyed by principal) in the Motoko backend, with frontend screens to create and edit the profile.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-public-live-chat-feed-where-authenticated-users-can-post-text-messages-and-see-messages-from-other-users-using-periodic-polling-not-websockets-to-simulate-live-updates",
+      "title": "Implement a public live chat feed where authenticated users can post text messages and see messages from other users, using periodic polling (not WebSockets) to simulate live updates.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-coherent-visual-theme-for-the-app-colors-typography-spacing-and-component-styling-and-apply-it-consistently-across-the-login-profile-and-chat-pages-avoid-blue-purple-as-primary-colors",
+      "title": "Create a coherent visual theme for the app (colors, typography, spacing, and component styling) and apply it consistently across the login, profile, and chat pages. Avoid blue/purple as primary colors.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-public-no-sign-in-required-about-onboarding-section-that-explains-what-the-dm-networks-project-is-how-users-can-interact-sign-in-with-internet-identity-create-edit-profile-post-messages-in-the-live-chat-and-clearly-states-that-the-project-is-managed-by-dmc-technologies-with-a-clickable-link-to-https-www-dmc-technologies-fr",
+      "title": "Add a public (no sign-in required) About/Onboarding section that explains what the DM Networks project is, how users can interact (sign in with Internet Identity, create/edit profile, post messages in the live chat), and clearly states that the project is managed by DMC Technologies with a clickable link to https://www.dmc-technologies.fr.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-global-layout-to-surface-dmc-technologies-attribution-consistently-e-g-in-the-footer-while-preserving-existing-branding-links-already-present-in-the-app",
+      "title": "Update the global layout to surface DMC Technologies attribution consistently (e.g., in the footer) while preserving existing branding links already present in the app.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Live chat for interacting with other users",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "User profiles with display name, bio, and social media links",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Add an onboarding/about section explaining how the project works and include branding/attribution that it is managed by DMC Technologies (link to https://www.dmc-technologies.fr)",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "DM Networks",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

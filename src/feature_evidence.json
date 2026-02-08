@@ -1,0 +1,44 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-add-a-public-no-sign-in-required-about-onboarding-section-that-explains-what-the-dm-networks-project-is-how-users-can-interact-sign-in-with-internet-identity-create-edit-profile-post-messages-in-the-live-chat-and-clearly-states-that-the-project-is-managed-by-dmc-technologies-with-a-clickable-link-to-https-www-dmc-technologies-fr",
+      "featureTitle": "Add a public (no sign-in required) About/Onboarding section that explains what the DM Networks project is, how users can interact (sign in with Internet Identity, create/edit profile, post messages in the live chat), and clearly states that the project is managed by DMC Technologies with a clickable link to https://www.dmc-technologies.fr.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/features/about/AboutPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-global-layout-to-surface-dmc-technologies-attribution-consistently-e-g-in-the-footer-while-preserving-existing-branding-links-already-present-in-the-app",
+      "featureTitle": "Update the global layout to surface DMC Technologies attribution consistently (e.g., in the footer) while preserving existing branding links already present in the app.",
+      "files": [
+        "frontend/src/App.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-6"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

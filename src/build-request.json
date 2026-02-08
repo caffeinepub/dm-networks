@@ -1,0 +1,56 @@
+{
+  "kind": "build_request",
+  "title": "Add About/Onboarding section and DMC Technologies attribution",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-5",
+      "text": "Add a public (no sign-in required) About/Onboarding section that explains what the DM Networks project is, how users can interact (sign in with Internet Identity, create/edit profile, post messages in the live chat), and clearly states that the project is managed by DMC Technologies with a clickable link to https://www.dmc-technologies.fr.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-1"
+        ],
+        "quotes": [
+          "user have to understand projetc, how interacts works and that is managed by dmc technologies (https://www.dmc-technologies.fr)"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When signed out, users can access an About/Onboarding view/section from the main UI (e.g., header or footer) without being blocked by AuthGate.",
+        "The About/Onboarding content is written in English and explains: what the app is, how to sign in, that profiles are used for display names, and that chat messages are visible to authenticated users.",
+        "The About/Onboarding content includes a visible attribution line stating the project is managed by DMC Technologies and includes a working external link to https://www.dmc-technologies.fr (opens in a new tab with rel=\"noopener noreferrer\")."
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Update the global layout to surface DMC Technologies attribution consistently (e.g., in the footer) while preserving existing branding links already present in the app.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-1"
+        ],
+        "quotes": [
+          "that is managed by dmc technologies (https://www.dmc-technologies.fr)"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The footer displays an English attribution mentioning “Managed by DMC Technologies” and links to https://www.dmc-technologies.fr.",
+        "Existing footer content (e.g., the caffeine.ai link) remains present unless it conflicts visually; any changes still keep the footer coherent and readable on mobile and desktop."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not edit any files under frontend/src/components/ui (compose these components instead).",
+    "Do not edit immutable paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx.",
+    "Use English for all user-facing text added or modified."
+  ],
+  "nonGoals": [
+    "Do not add third-party authentication beyond Internet Identity.",
+    "Do not introduce WebSockets or real-time infrastructure; keep existing polling-based chat behavior.",
+    "Do not change backend data schema or add new backend endpoints unless strictly required for the About/Onboarding content (expected: not required)."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

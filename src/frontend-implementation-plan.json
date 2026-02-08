@@ -1,0 +1,43 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Public About/Onboarding section and DMC Technologies attribution",
+  "requirements": [
+    {
+      "id": "REQ-5",
+      "summary": "Add a public About/Onboarding view that explains DM Networks, how to sign in and use profiles/chat, and includes DMC Technologies attribution with external link.",
+      "acceptanceCriteria": [
+        "When signed out, users can access an About/Onboarding view/section from the main UI (e.g., header or footer) without being blocked by AuthGate.",
+        "The About/Onboarding content is written in English and explains: what the app is, how to sign in, that profiles are used for display names, and that chat messages are visible to authenticated users.",
+        "The About/Onboarding content includes a visible attribution line stating the project is managed by DMC Technologies and includes a working external link to https://www.dmc-technologies.fr (opens in a new tab with rel=\"noopener noreferrer\")."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/features/about/AboutPage.tsx",
+          "operation": "create",
+          "description": "Create a public About/Onboarding page (not wrapped by AuthGate) describing: what DM Networks is, how to sign in with Internet Identity, how profiles provide display names, and how to participate in the live chat; include a clear attribution line “Managed by DMC Technologies” with an external link to https://www.dmc-technologies.fr that opens in a new tab and uses rel=\"noopener noreferrer\". Use shadcn-ui composed components (e.g., Card, Separator, Typography patterns) for consistent styling. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wire the new About/Onboarding view into the main UI so it is reachable when signed out: extend the view state to include an “About” option, add a header (and optionally footer) navigation control that is always visible (not gated by authentication), and render AboutPage when selected. Ensure About is accessible without triggering AuthGate while existing Chat/Profile behavior remains unchanged."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Update the global footer to consistently show “Managed by DMC Technologies” attribution while preserving existing branding links.",
+      "acceptanceCriteria": [
+        "The footer displays an English attribution mentioning “Managed by DMC Technologies” and links to https://www.dmc-technologies.fr.",
+        "Existing footer content (e.g., the caffeine.ai link) remains present unless it conflicts visually; any changes still keep the footer coherent and readable on mobile and desktop."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Update the global footer layout to include a persistent, readable attribution line “Managed by DMC Technologies” linking to https://www.dmc-technologies.fr (new tab + rel=\"noopener noreferrer\"), while keeping the existing caffeine.ai link and overall footer coherence across mobile and desktop (e.g., stacked lines or responsive flex wrapping)."
+        }
+      ]
+    }
+  ]
+}
