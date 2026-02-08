@@ -1,13 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { UserProfile, ChatMessage } from '../backend';
+import type { SerializableUserProfile, ChatMessage, PublicProfile } from '../backend';
 import { Principal } from '@dfinity/principal';
+import { useAuth } from './useAuth';
 
 // Profile Queries
 export function useGetCallerUserProfile() {
   const { actor, isFetching: actorFetching } = useActor();
 
-  const query = useQuery<UserProfile | null>({
+  const query = useQuery<SerializableUserProfile | null>({
     queryKey: ['currentUserProfile'],
     queryFn: async () => {
       if (!actor) throw new Error('Actor not available');
@@ -29,12 +30,13 @@ export function useSaveCallerUserProfile() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (profile: UserProfile) => {
+    mutationFn: async (profile: SerializableUserProfile) => {
       if (!actor) throw new Error('Actor not available');
       return actor.saveCallerUserProfile(profile);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+      queryClient.invalidateQueries({ queryKey: ['memberDirectory'] });
     },
   });
 }
@@ -42,7 +44,7 @@ export function useSaveCallerUserProfile() {
 export function useGetUserProfile(principal: Principal | undefined) {
   const { actor, isFetching: actorFetching } = useActor();
 
-  return useQuery<UserProfile | null>({
+  return useQuery<SerializableUserProfile | null>({
     queryKey: ['userProfile', principal?.toString()],
     queryFn: async () => {
       if (!actor || !principal) return null;
@@ -83,3 +85,48 @@ export function useCreateChatMessage() {
   });
 }
 
+export function useDeleteChatMessage() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (messageId: bigint) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.deleteChatMessage(messageId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chatMessages'] });
+    },
+  });
+}
+
+// Admin Query
+export function useIsCallerAdmin() {
+  const { actor, isFetching: actorFetching } = useActor();
+
+  return useQuery<boolean>({
+    queryKey: ['isCallerAdmin'],
+    queryFn: async () => {
+      if (!actor) return false;
+      return actor.isCallerAdmin();
+    },
+    enabled: !!actor && !actorFetching,
+    staleTime: 60000, // Cache for 1 minute
+  });
+}
+
+// Members Directory Query
+export function useMemberDirectory() {
+  const { actor, isFetching: actorFetching } = useActor();
+  const { principal } = useAuth();
+
+  return useQuery<PublicProfile[]>({
+    queryKey: ['memberDirectory', principal?.toString()],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getMemberDirectory();
+    },
+    enabled: !!actor && !actorFetching && !!principal,
+    staleTime: 30000, // Cache for 30 seconds
+  });
+}

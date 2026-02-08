@@ -1,33 +1,46 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-08T12:07:25.799Z",
-  "summary": "The diff adds a new public About/Onboarding page and exposes it from the main UI for signed-out users, and it appears to add DMC Technologies attribution in the global layout/footer while keeping existing branding links. However, the evidence provided is truncated, so some acceptance-criteria details (notably link target/rel attributes) cannot be fully verified from the diff summary.",
+  "generatedAt": "2026-02-08T14:06:10.156Z",
+  "summary": "Implemented the new profile \"number\" field across backend types/migration and frontend form/validation, and updated business-oriented validation messages. Backend getUserProfile privacy filtering explicitly clears number for private profiles viewed by non-owners. Members/Profile UI appears to have been updated broadly, but evidence for getMemberDirectory privacy handling and for displaying the number-field validation error near the field is not present in the provided truncated diff.",
   "missing_requirements": [
     {
-      "id": "REQ-5",
-      "requirement": "About/Onboarding attribution link to https://www.dmc-technologies.fr opens in a new tab and uses rel=\"noopener noreferrer\".",
-      "reason": "The AboutPage content is truncated before any attribution/link markup is shown, so there is no explicit evidence that the DMC Technologies link includes target=\"_blank\" and rel=\"noopener noreferrer\".",
+      "id": "REQ-24",
+      "requirement": "Update backend privacy filtering logic (getUserProfile and getMemberDirectory) to ensure the new number field is treated as public-only data (owner/admin always; others only when Public; blanked for Private to non-owners).",
+      "reason": "The diff shows getUserProfile clearing `number` for private profiles to non-owners, but the getMemberDirectory implementation is not shown in the truncated backend/main.mo excerpt, so it’s not verifiable that member-directory responses also blank `number` for private profiles to non-owners and include it for public profiles.",
       "evidence": [
-        "frontend/src/features/about/AboutPage.tsx (truncated)"
+        "backend/main.mo (truncated; getUserProfile shown, getMemberDirectory not shown)"
       ]
     },
     {
-      "id": "REQ-6",
-      "requirement": "Footer attribution link to https://www.dmc-technologies.fr is present and (if opening externally) uses appropriate external-link attributes while preserving existing footer branding links.",
-      "reason": "The modified App.tsx is truncated before the footer implementation is visible; the only indication is a secondary summary text, which does not prove exact footer markup/attributes or preservation of existing links.",
+      "id": "REQ-22",
+      "requirement": "Display an English validation error message near the \"Number\" field and prevent save when invalid (only for Public visibility).",
+      "reason": "Validation logic for `number` exists, but the truncated ProfileForm.tsx excerpt does not show the render section where field-level errors are displayed, so it’s not verifiable that an error message is shown near the Number field when invalid.",
       "evidence": [
-        "frontend/src/App.tsx (truncated)",
-        "frontend-file-summaries.txt"
+        "frontend/src/features/profile/validateProfile.ts",
+        "frontend/src/features/profile/ProfileForm.tsx (truncated; rendering of number field/error not shown)"
       ]
     }
   ],
-  "hallucinated_features": [],
-  "confidence": 0.54,
+  "hallucinated_features": [
+    {
+      "description": "Members Directory page gains extensive client-side filtering UI (search by name, bio keyword filter, social links filter) and additional UI elements/icons beyond just renaming labels.",
+      "reason": "REQ-23 only asked to rename specific labels in member cards under existing visibility rules; the diff indicates broader filtering and UI restructuring that is not requested in the BuildRequest.",
+      "evidence": [
+        "frontend/src/features/members/MembersPage.tsx (truncated)"
+      ]
+    }
+  ],
+  "confidence": 0.62,
   "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/App.tsx",
-    "frontend/src/features/about/AboutPage.tsx",
+    "frontend/src/features/members/MembersPage.tsx",
+    "frontend/src/features/profile/ProfileForm.tsx",
+    "frontend/src/features/profile/ProfilePage.tsx",
+    "frontend/src/features/profile/validateProfile.ts",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json"
   ]
 }

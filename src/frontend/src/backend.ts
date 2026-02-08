@@ -89,15 +89,30 @@ export class ExternalBlob {
         return this;
     }
 }
+export interface SerializableUserProfile {
+    bio: string;
+    currentProjects: string;
+    programmingLanguages: string;
+    displayName: string;
+    activityInterests: string;
+    socialLinks: Array<string>;
+    number: string;
+    visibility: ProfileVisibility;
+    skills: string;
+}
+export interface PublicProfile {
+    principal: Principal;
+    profile: SerializableUserProfile;
+}
 export interface ChatMessage {
+    id: bigint;
     content: string;
     author: Principal;
     timestamp: bigint;
 }
-export interface UserProfile {
-    bio: string;
-    displayName: string;
-    socialLinks: Array<string>;
+export enum ProfileVisibility {
+    privateVisibility = "privateVisibility",
+    publicVisibility = "publicVisibility"
 }
 export enum UserRole {
     admin = "admin",
@@ -107,15 +122,17 @@ export enum UserRole {
 export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    createChatMessage(content: string): Promise<void>;
-    getCallerUserProfile(): Promise<UserProfile | null>;
+    createChatMessage(content: string): Promise<bigint>;
+    deleteChatMessage(messageId: bigint): Promise<void>;
+    getCallerUserProfile(): Promise<SerializableUserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getChatMessages(): Promise<Array<ChatMessage>>;
-    getUserProfile(user: Principal): Promise<UserProfile | null>;
+    getMemberDirectory(): Promise<Array<PublicProfile>>;
+    getUserProfile(user: Principal): Promise<SerializableUserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
-    saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    saveCallerUserProfile(profile: SerializableUserProfile): Promise<void>;
 }
-import type { UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
+import type { ProfileVisibility as _ProfileVisibility, PublicProfile as _PublicProfile, SerializableUserProfile as _SerializableUserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
@@ -146,7 +163,7 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async createChatMessage(arg0: string): Promise<void> {
+    async createChatMessage(arg0: string): Promise<bigint> {
         if (this.processError) {
             try {
                 const result = await this.actor.createChatMessage(arg0);
@@ -160,7 +177,21 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async getCallerUserProfile(): Promise<UserProfile | null> {
+    async deleteChatMessage(arg0: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteChatMessage(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteChatMessage(arg0);
+            return result;
+        }
+    }
+    async getCallerUserProfile(): Promise<SerializableUserProfile | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getCallerUserProfile();
@@ -178,14 +209,14 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getCallerUserRole();
-                return from_candid_UserRole_n4(this._uploadFile, this._downloadFile, result);
+                return from_candid_UserRole_n8(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getCallerUserRole();
-            return from_candid_UserRole_n4(this._uploadFile, this._downloadFile, result);
+            return from_candid_UserRole_n8(this._uploadFile, this._downloadFile, result);
         }
     }
     async getChatMessages(): Promise<Array<ChatMessage>> {
@@ -202,7 +233,21 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
+    async getMemberDirectory(): Promise<Array<PublicProfile>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getMemberDirectory();
+                return from_candid_vec_n10(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getMemberDirectory();
+            return from_candid_vec_n10(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getUserProfile(arg0: Principal): Promise<SerializableUserProfile | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getUserProfile(arg0);
@@ -230,28 +275,89 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async saveCallerUserProfile(arg0: UserProfile): Promise<void> {
+    async saveCallerUserProfile(arg0: SerializableUserProfile): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.saveCallerUserProfile(arg0);
+                const result = await this.actor.saveCallerUserProfile(to_candid_SerializableUserProfile_n13(this._uploadFile, this._downloadFile, arg0));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.saveCallerUserProfile(arg0);
+            const result = await this.actor.saveCallerUserProfile(to_candid_SerializableUserProfile_n13(this._uploadFile, this._downloadFile, arg0));
             return result;
         }
     }
 }
-function from_candid_UserRole_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
-    return from_candid_variant_n5(_uploadFile, _downloadFile, value);
+function from_candid_ProfileVisibility_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ProfileVisibility): ProfileVisibility {
+    return from_candid_variant_n7(_uploadFile, _downloadFile, value);
 }
-function from_candid_opt_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
-    return value.length === 0 ? null : value[0];
+function from_candid_PublicProfile_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _PublicProfile): PublicProfile {
+    return from_candid_record_n12(_uploadFile, _downloadFile, value);
 }
-function from_candid_variant_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_SerializableUserProfile_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _SerializableUserProfile): SerializableUserProfile {
+    return from_candid_record_n5(_uploadFile, _downloadFile, value);
+}
+function from_candid_UserRole_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
+    return from_candid_variant_n9(_uploadFile, _downloadFile, value);
+}
+function from_candid_opt_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_SerializableUserProfile]): SerializableUserProfile | null {
+    return value.length === 0 ? null : from_candid_SerializableUserProfile_n4(_uploadFile, _downloadFile, value[0]);
+}
+function from_candid_record_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    principal: Principal;
+    profile: _SerializableUserProfile;
+}): {
+    principal: Principal;
+    profile: SerializableUserProfile;
+} {
+    return {
+        principal: value.principal,
+        profile: from_candid_SerializableUserProfile_n4(_uploadFile, _downloadFile, value.profile)
+    };
+}
+function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    bio: string;
+    currentProjects: string;
+    programmingLanguages: string;
+    displayName: string;
+    activityInterests: string;
+    socialLinks: Array<string>;
+    number: string;
+    visibility: _ProfileVisibility;
+    skills: string;
+}): {
+    bio: string;
+    currentProjects: string;
+    programmingLanguages: string;
+    displayName: string;
+    activityInterests: string;
+    socialLinks: Array<string>;
+    number: string;
+    visibility: ProfileVisibility;
+    skills: string;
+} {
+    return {
+        bio: value.bio,
+        currentProjects: value.currentProjects,
+        programmingLanguages: value.programmingLanguages,
+        displayName: value.displayName,
+        activityInterests: value.activityInterests,
+        socialLinks: value.socialLinks,
+        number: value.number,
+        visibility: from_candid_ProfileVisibility_n6(_uploadFile, _downloadFile, value.visibility),
+        skills: value.skills
+    };
+}
+function from_candid_variant_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    privateVisibility: null;
+} | {
+    publicVisibility: null;
+}): ProfileVisibility {
+    return "privateVisibility" in value ? ProfileVisibility.privateVisibility : "publicVisibility" in value ? ProfileVisibility.publicVisibility : value;
+}
+function from_candid_variant_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     admin: null;
 } | {
     user: null;
@@ -260,8 +366,61 @@ function from_candid_variant_n5(_uploadFile: (file: ExternalBlob) => Promise<Uin
 }): UserRole {
     return "admin" in value ? UserRole.admin : "user" in value ? UserRole.user : "guest" in value ? UserRole.guest : value;
 }
+function from_candid_vec_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_PublicProfile>): Array<PublicProfile> {
+    return value.map((x)=>from_candid_PublicProfile_n11(_uploadFile, _downloadFile, x));
+}
+function to_candid_ProfileVisibility_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ProfileVisibility): _ProfileVisibility {
+    return to_candid_variant_n16(_uploadFile, _downloadFile, value);
+}
+function to_candid_SerializableUserProfile_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: SerializableUserProfile): _SerializableUserProfile {
+    return to_candid_record_n14(_uploadFile, _downloadFile, value);
+}
 function to_candid_UserRole_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
     return to_candid_variant_n2(_uploadFile, _downloadFile, value);
+}
+function to_candid_record_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    bio: string;
+    currentProjects: string;
+    programmingLanguages: string;
+    displayName: string;
+    activityInterests: string;
+    socialLinks: Array<string>;
+    number: string;
+    visibility: ProfileVisibility;
+    skills: string;
+}): {
+    bio: string;
+    currentProjects: string;
+    programmingLanguages: string;
+    displayName: string;
+    activityInterests: string;
+    socialLinks: Array<string>;
+    number: string;
+    visibility: _ProfileVisibility;
+    skills: string;
+} {
+    return {
+        bio: value.bio,
+        currentProjects: value.currentProjects,
+        programmingLanguages: value.programmingLanguages,
+        displayName: value.displayName,
+        activityInterests: value.activityInterests,
+        socialLinks: value.socialLinks,
+        number: value.number,
+        visibility: to_candid_ProfileVisibility_n15(_uploadFile, _downloadFile, value.visibility),
+        skills: value.skills
+    };
+}
+function to_candid_variant_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ProfileVisibility): {
+    privateVisibility: null;
+} | {
+    publicVisibility: null;
+} {
+    return value == ProfileVisibility.privateVisibility ? {
+        privateVisibility: null
+    } : value == ProfileVisibility.publicVisibility ? {
+        publicVisibility: null
+    } : value;
 }
 function to_candid_variant_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
     admin: null;

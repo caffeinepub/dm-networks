@@ -4,10 +4,11 @@ import LoginButton from './components/auth/LoginButton';
 import ProfilePage from './features/profile/ProfilePage';
 import ChatPage from './features/chat/ChatPage';
 import AboutPage from './features/about/AboutPage';
-import { MessageSquare, User, Info, ExternalLink } from 'lucide-react';
+import MembersPage from './features/members/MembersPage';
+import { MessageSquare, User, Info, ExternalLink, Users } from 'lucide-react';
 import { SiCaffeine } from 'react-icons/si';
 
-type View = 'chat' | 'profile' | 'about';
+type View = 'chat' | 'profile' | 'about' | 'members';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<View>('about');
@@ -47,6 +48,17 @@ export default function App() {
                   >
                     <MessageSquare className="h-4 w-4" />
                     Chat
+                  </button>
+                  <button
+                    onClick={() => setCurrentView('members')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      currentView === 'members'
+                        ? 'bg-accent text-accent-foreground'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                    }`}
+                  >
+                    <Users className="h-4 w-4" />
+                    Members
                   </button>
                   <button
                     onClick={() => setCurrentView('profile')}
@@ -94,6 +106,17 @@ export default function App() {
               Chat
             </button>
             <button
+              onClick={() => setCurrentView('members')}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                currentView === 'members'
+                  ? 'bg-accent text-accent-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+              }`}
+            >
+              <Users className="h-4 w-4" />
+              Members
+            </button>
+            <button
               onClick={() => setCurrentView('profile')}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 currentView === 'profile'
@@ -114,6 +137,8 @@ export default function App() {
           <AboutPage />
         ) : currentView === 'chat' ? (
           <ChatPage />
+        ) : currentView === 'members' ? (
+          <MembersPage />
         ) : (
           <ProfilePage />
         )}

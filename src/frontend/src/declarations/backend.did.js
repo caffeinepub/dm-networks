@@ -13,31 +13,52 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
-export const UserProfile = IDL.Record({
+export const ProfileVisibility = IDL.Variant({
+  'privateVisibility' : IDL.Null,
+  'publicVisibility' : IDL.Null,
+});
+export const SerializableUserProfile = IDL.Record({
   'bio' : IDL.Text,
+  'currentProjects' : IDL.Text,
+  'programmingLanguages' : IDL.Text,
   'displayName' : IDL.Text,
+  'activityInterests' : IDL.Text,
   'socialLinks' : IDL.Vec(IDL.Text),
+  'number' : IDL.Text,
+  'visibility' : ProfileVisibility,
+  'skills' : IDL.Text,
 });
 export const ChatMessage = IDL.Record({
+  'id' : IDL.Nat,
   'content' : IDL.Text,
   'author' : IDL.Principal,
   'timestamp' : IDL.Int,
+});
+export const PublicProfile = IDL.Record({
+  'principal' : IDL.Principal,
+  'profile' : SerializableUserProfile,
 });
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-  'createChatMessage' : IDL.Func([IDL.Text], [], []),
-  'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
+  'createChatMessage' : IDL.Func([IDL.Text], [IDL.Nat], []),
+  'deleteChatMessage' : IDL.Func([IDL.Nat], [], []),
+  'getCallerUserProfile' : IDL.Func(
+      [],
+      [IDL.Opt(SerializableUserProfile)],
+      ['query'],
+    ),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getChatMessages' : IDL.Func([], [IDL.Vec(ChatMessage)], ['query']),
+  'getMemberDirectory' : IDL.Func([], [IDL.Vec(PublicProfile)], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
-      [IDL.Opt(UserProfile)],
+      [IDL.Opt(SerializableUserProfile)],
       ['query'],
     ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-  'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'saveCallerUserProfile' : IDL.Func([SerializableUserProfile], [], []),
 });
 
 export const idlInitArgs = [];
@@ -48,31 +69,52 @@ export const idlFactory = ({ IDL }) => {
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
-  const UserProfile = IDL.Record({
+  const ProfileVisibility = IDL.Variant({
+    'privateVisibility' : IDL.Null,
+    'publicVisibility' : IDL.Null,
+  });
+  const SerializableUserProfile = IDL.Record({
     'bio' : IDL.Text,
+    'currentProjects' : IDL.Text,
+    'programmingLanguages' : IDL.Text,
     'displayName' : IDL.Text,
+    'activityInterests' : IDL.Text,
     'socialLinks' : IDL.Vec(IDL.Text),
+    'number' : IDL.Text,
+    'visibility' : ProfileVisibility,
+    'skills' : IDL.Text,
   });
   const ChatMessage = IDL.Record({
+    'id' : IDL.Nat,
     'content' : IDL.Text,
     'author' : IDL.Principal,
     'timestamp' : IDL.Int,
+  });
+  const PublicProfile = IDL.Record({
+    'principal' : IDL.Principal,
+    'profile' : SerializableUserProfile,
   });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-    'createChatMessage' : IDL.Func([IDL.Text], [], []),
-    'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
+    'createChatMessage' : IDL.Func([IDL.Text], [IDL.Nat], []),
+    'deleteChatMessage' : IDL.Func([IDL.Nat], [], []),
+    'getCallerUserProfile' : IDL.Func(
+        [],
+        [IDL.Opt(SerializableUserProfile)],
+        ['query'],
+      ),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getChatMessages' : IDL.Func([], [IDL.Vec(ChatMessage)], ['query']),
+    'getMemberDirectory' : IDL.Func([], [IDL.Vec(PublicProfile)], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
-        [IDL.Opt(UserProfile)],
+        [IDL.Opt(SerializableUserProfile)],
         ['query'],
       ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-    'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'saveCallerUserProfile' : IDL.Func([SerializableUserProfile], [], []),
   });
 };
 

@@ -11,14 +11,27 @@ import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
 export interface ChatMessage {
+  'id' : bigint,
   'content' : string,
   'author' : Principal,
   'timestamp' : bigint,
 }
-export interface UserProfile {
+export type ProfileVisibility = { 'privateVisibility' : null } |
+  { 'publicVisibility' : null };
+export interface PublicProfile {
+  'principal' : Principal,
+  'profile' : SerializableUserProfile,
+}
+export interface SerializableUserProfile {
   'bio' : string,
+  'currentProjects' : string,
+  'programmingLanguages' : string,
   'displayName' : string,
+  'activityInterests' : string,
   'socialLinks' : Array<string>,
+  'number' : string,
+  'visibility' : ProfileVisibility,
+  'skills' : string,
 }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
@@ -26,13 +39,15 @@ export type UserRole = { 'admin' : null } |
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'createChatMessage' : ActorMethod<[string], undefined>,
-  'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
+  'createChatMessage' : ActorMethod<[string], bigint>,
+  'deleteChatMessage' : ActorMethod<[bigint], undefined>,
+  'getCallerUserProfile' : ActorMethod<[], [] | [SerializableUserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getChatMessages' : ActorMethod<[], Array<ChatMessage>>,
-  'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
+  'getMemberDirectory' : ActorMethod<[], Array<PublicProfile>>,
+  'getUserProfile' : ActorMethod<[Principal], [] | [SerializableUserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
-  'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'saveCallerUserProfile' : ActorMethod<[SerializableUserProfile], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

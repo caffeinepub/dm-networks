@@ -4,13 +4,13 @@ import ProfileForm from './ProfileForm';
 import { useGetCallerUserProfile, useSaveCallerUserProfile } from '../../hooks/useQueries';
 import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/sonner';
-import type { UserProfile } from '../../backend';
+import type { SerializableUserProfile } from '../../backend';
 
 export default function ProfilePage() {
   const { data: userProfile, isLoading, isFetched } = useGetCallerUserProfile();
   const saveMutation = useSaveCallerUserProfile();
 
-  const handleSave = async (profile: UserProfile) => {
+  const handleSave = async (profile: SerializableUserProfile) => {
     try {
       await saveMutation.mutateAsync(profile);
       toast.success('Profile saved successfully!');
@@ -42,4 +42,3 @@ export default function ProfilePage() {
     </AuthGate>
   );
 }
-

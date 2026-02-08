@@ -1,41 +1,77 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Public About/Onboarding section and DMC Technologies attribution",
+  "title": "Update Profile & Members labels; add public-only Number field (frontend)",
   "requirements": [
     {
-      "id": "REQ-5",
-      "summary": "Add a public About/Onboarding view that explains DM Networks, how to sign in and use profiles/chat, and includes DMC Technologies attribution with external link.",
+      "id": "REQ-20",
+      "summary": "Update Profile page edit-form labels/placeholders for public profile fields to business-oriented wording.",
       "acceptanceCriteria": [
-        "When signed out, users can access an About/Onboarding view/section from the main UI (e.g., header or footer) without being blocked by AuthGate.",
-        "The About/Onboarding content is written in English and explains: what the app is, how to sign in, that profiles are used for display names, and that chat messages are visible to authenticated users.",
-        "The About/Onboarding content includes a visible attribution line stating the project is managed by DMC Technologies and includes a working external link to https://www.dmc-technologies.fr (opens in a new tab with rel=\"noopener noreferrer\")."
+        "On the Profile page edit form, the labels for the public-only fields are updated exactly to: \"Business name\", \"Slogan\", \"Business Description\", and \"Location\".",
+        "Any helper text/placeholder text that explicitly references the old field meaning is updated to be consistent with the new label intent (business-oriented wording).",
+        "No other unrelated labels are changed."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/features/about/AboutPage.tsx",
-          "operation": "create",
-          "description": "Create a public About/Onboarding page (not wrapped by AuthGate) describing: what DM Networks is, how to sign in with Internet Identity, how profiles provide display names, and how to participate in the live chat; include a clear attribution line “Managed by DMC Technologies” with an external link to https://www.dmc-technologies.fr that opens in a new tab and uses rel=\"noopener noreferrer\". Use shadcn-ui composed components (e.g., Card, Separator, Typography patterns) for consistent styling. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/features/profile/ProfileForm.tsx",
           "operation": "modify",
-          "description": "Wire the new About/Onboarding view into the main UI so it is reachable when signed out: extend the view state to include an “About” option, add a header (and optionally footer) navigation control that is always visible (not gated by authentication), and render AboutPage when selected. Ensure About is accessible without triggering AuthGate while existing Chat/Profile behavior remains unchanged."
+          "description": "Update the public-only field labels: Skills→\"Business name\", Programming Languages→\"Slogan\", Current Projects→\"Business Description\", Activity Interests→\"Location\"; update any related placeholder/help text to match the new business-oriented intent while leaving unrelated labels unchanged."
         }
       ]
     },
     {
-      "id": "REQ-6",
-      "summary": "Update the global footer to consistently show “Managed by DMC Technologies” attribution while preserving existing branding links.",
+      "id": "REQ-21",
+      "summary": "Add a new public-only \"Number\" field to the Profile form, saved only for Public visibility and cleared when Private.",
       "acceptanceCriteria": [
-        "The footer displays an English attribution mentioning “Managed by DMC Technologies” and links to https://www.dmc-technologies.fr.",
-        "Existing footer content (e.g., the caffeine.ai link) remains present unless it conflicts visually; any changes still keep the footer coherent and readable on mobile and desktop."
+        "Backend Candid types include the new profile field (e.g., a Text field) for storing the number.",
+        "The Profile form shows a new input labeled \"Number\" only when Profile Visibility is Public.",
+        "When switching visibility to Private and saving, the stored number value is cleared (empty string) similarly to other public-only fields.",
+        "Saving and reloading the profile preserves the number value for Public profiles."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/features/profile/ProfileForm.tsx",
           "operation": "modify",
-          "description": "Update the global footer layout to include a persistent, readable attribution line “Managed by DMC Technologies” linking to https://www.dmc-technologies.fr (new tab + rel=\"noopener noreferrer\"), while keeping the existing caffeine.ai link and overall footer coherence across mobile and desktop (e.g., stacked lines or responsive flex wrapping)."
+          "description": "Add a new controlled input labeled \"Number\" within the public-only section; bind it to profile state initialized from the loaded profile, include it in the saved UserProfile payload when visibility is Public, and send an empty string when visibility is Private to ensure it is cleared consistently with other public-only fields."
+        }
+      ]
+    },
+    {
+      "id": "REQ-22",
+      "summary": "Extend profile validation to validate the new public-only \"Number\" field and show an English error near the field on failure.",
+      "acceptanceCriteria": [
+        "Profile validation is extended to validate the \"Number\" field only when visibility is Public.",
+        "If the number fails validation, the Profile form prevents save and displays an English error message near the field.",
+        "Existing validation behavior for other fields remains unchanged."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/features/profile/validateProfile.ts",
+          "operation": "modify",
+          "description": "Extend validation inputs and returned error shape to include a \"number\" field; validate only for public visibility with reasonable constraints (e.g., allowed characters and length) and return an English error message when invalid, without changing existing validation behavior for other fields."
+        },
+        {
+          "path": "frontend/src/features/profile/ProfileForm.tsx",
+          "operation": "modify",
+          "description": "Wire the new \"Number\" value into validateProfile() calls and display any returned validation error message near the \"Number\" field; ensure save is prevented when validation fails."
+        }
+      ]
+    },
+    {
+      "id": "REQ-23",
+      "summary": "Update Members Directory cards to show the renamed public-profile labels for the existing public-only fields.",
+      "acceptanceCriteria": [
+        "In Members Directory cards, the label \"Skills\" is replaced with \"Business name\".",
+        "In Members Directory cards, the label \"Programming Languages\" is replaced with \"Slogan\".",
+        "In Members Directory cards, the label \"Current Projects\" is replaced with \"Business Description\".",
+        "In Members Directory cards, the label \"Activity Interests\" is replaced with \"Location\".",
+        "Private profile behavior remains unchanged (public-only fields are not shown)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/features/members/MembersPage.tsx",
+          "operation": "modify",
+          "description": "Replace the Members Directory card labels for the four public-only fields to the new wording (Business name/Slogan/Business Description/Location) while preserving existing visibility behavior so private profiles do not display public-only fields."
         }
       ]
     }

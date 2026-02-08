@@ -1,8 +1,10 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 5,
+  "projectStateVersion": 13,
   "summary": "DM Networks: a live chat app where users can interact with other users and create a simple profile (display name, bio, social media links), with clear in-app explanation of how the project works and branding/attribution that it is managed by DMC Technologies (https://www.dmc-technologies.fr).",
-  "architectural_notes": [],
+  "architectural_notes": [
+    "Introduce an admin/moderator authorization concept for chat moderation actions (e.g., delete message) and for assigning user badges."
+  ],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
@@ -53,6 +55,94 @@
         "REQ-6"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-a-new-authenticated-members-page-in-the-frontend-that-displays-a-directory-of-network-members-based-on-saved-user-profiles-and-is-accessible-from-the-main-navigation-desktop-and-mobile-alongside-about-chat-profile",
+      "title": "Add a new authenticated Members page in the frontend that displays a directory of network members (based on saved user profiles) and is accessible from the main navigation (desktop and mobile) alongside About/Chat/Profile.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-profile-based-filters-on-the-members-page-to-help-users-find-members-using-fields-from-userprofile",
+      "title": "Implement profile-based filters on the Members page to help users find members using fields from UserProfile.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-react-query-data-fetching-for-the-members-directory-including-loading-and-error-states-and-ensure-the-request-uses-the-authenticated-actor",
+      "title": "Add React Query data fetching for the members directory, including loading and error states, and ensure the request uses the authenticated actor.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-profile-edit-ui-to-let-the-signed-in-user-choose-profile-visibility-public-private-and-to-conditionally-show-and-validate-activity-related-questions-only-when-visibility-is-public-while-showing-only-basic-information-fields-when-visibility-is-private",
+      "title": "Update the profile edit UI to let the signed-in user choose profile visibility (Public/Private) and to conditionally show and validate activity-related questions only when visibility is Public, while showing only basic information fields when visibility is Private.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-members-directory-ui-and-filtering-logic-to-respect-profile-visibility-and-only-display-the-fields-allowed-for-the-viewer-basic-fields-for-private-profiles-full-fields-for-public-profiles-including-showing-a-clear-label-badge-indicating-when-a-profile-is-private",
+      "title": "Update the Members Directory UI and filtering logic to respect profile visibility and only display the fields allowed for the viewer (basic fields for Private profiles; full fields for Public profiles), including showing a clear label/badge indicating when a profile is Private.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-live-chat-ui-to-show-a-delete-control-for-each-message-only-when-the-signed-in-user-is-an-administrator-and-wire-it-to-the-backend-deletion-method-with-appropriate-loading-error-handling",
+      "title": "Update the Live Chat UI to show a delete control for each message only when the signed-in user is an administrator, and wire it to the backend deletion method with appropriate loading/error handling.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-react-query-hooks-for-1-fetching-admin-status-and-2-deleting-chat-messages-using-the-authenticated-actor-and-integrating-with-existing-chat-polling-invalidation-behavior",
+      "title": "Add React Query hooks for (1) fetching admin status and (2) deleting chat messages, using the authenticated actor and integrating with existing chat polling/invalidation behavior.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-profile-page-public-profile-section-user-facing-labels-to-match-the-new-business-oriented-wording-skills-business-name-programming-languages-slogan-current-projects-business-description-activity-interests-location",
+      "title": "Update the Profile page (public profile section) user-facing labels to match the new business-oriented wording: Skills → \"Business name\", Programming Languages → \"Slogan\", Current Projects → \"Business Description\", Activity Interests → \"Location\".",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-new-number-phone-number-field-to-the-user-profile-model-collected-and-saved-from-the-profile-page-when-the-profile-visibility-is-public-and-hidden-cleared-when-visibility-is-private-consistent-with-other-public-only-fields",
+      "title": "Add a new \"Number\" (phone/number) field to the user profile model, collected and saved from the Profile page when the profile visibility is Public, and hidden/cleared when visibility is Private (consistent with other public-only fields).",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-profile-validation-to-include-the-new-number-field-only-when-visibility-is-public-with-reasonable-constraints-and-an-english-validation-error-message-when-invalid",
+      "title": "Update profile validation to include the new \"Number\" field (only when visibility is Public) with reasonable constraints and an English validation error message when invalid.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-members-directory-ui-to-display-the-renamed-field-labels-for-public-profiles-business-name-slogan-business-description-and-location-only-when-the-corresponding-values-are-present-and-the-viewer-is-allowed-to-see-them-under-existing-visibility-rules",
+      "title": "Update the Members Directory UI to display the renamed field labels for public profiles: \"Business name\", \"Slogan\", \"Business Description\", and \"Location\" (only when the corresponding values are present and the viewer is allowed to see them under existing visibility rules).",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -72,6 +162,98 @@
       "id": "AR-3",
       "summary": "Add an onboarding/about section explaining how the project works and include branding/attribution that it is managed by DMC Technologies (link to https://www.dmc-technologies.fr)",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Add a dedicated members directory page where network members can view other users and filter the list based on user profile fields",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Add backend support for an authenticated “members directory” so network members can retrieve a list of user profiles (including the profile owner principal) for display in a dedicated directory page.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Update backend authorization rules so authenticated users can view other users’ profiles (at least the fields already present in UserProfile) when used by the members directory and existing UI helpers (e.g., author display name resolution).",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Allow users to set their profile as public or private; public profiles collect/display additional activity-related info, while private profiles only show basic information.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Extend the backend profile model to support a user-selected visibility setting (Public or Private) and additional activity-related fields that are only applicable when a profile is Public.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Update backend read APIs to enforce visibility rules: when a target profile is Private and the caller is not the owner, only return basic profile information; when a profile is Public, return the full profile including activity-related fields.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Add an administrator area/role that can delete messages in the public live chat feed (moderation capability).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Allow administrators to assign a “confirmed user” badge to users, and display this badge in relevant UI (e.g., profiles/members directory/chat).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Add backend support for chat message moderation by administrators: each chat message must have a stable unique identifier, and the canister must expose an admin-only method to delete a message by that identifier.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Expose a backend method that allows the frontend to determine whether the current caller is an administrator (e.g., isCallerAdmin query).",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Update Public Profile page field labels: Skills→Business name, Programming languages→Slogan, Current Project→Business Description, Activity interests→Location",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Add a phone/number field to the user profile (collect + display on profile page, especially Public profile)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Update backend privacy filtering logic (getUserProfile and getMemberDirectory) to ensure the new number field is treated as public-only data: owner/admin can see it always; other users can see it only when the profile is Public; and it is blanked when returning a Private profile to non-owners.",
+      "reqIds": [
+        "REQ-24"
+      ],
       "status": "pending"
     }
   ],

@@ -2,11 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-a-public-no-sign-in-required-about-onboarding-section-that-explains-what-the-dm-networks-project-is-how-users-can-interact-sign-in-with-internet-identity-create-edit-profile-post-messages-in-the-live-chat-and-clearly-states-that-the-project-is-managed-by-dmc-technologies-with-a-clickable-link-to-https-www-dmc-technologies-fr",
-      "featureTitle": "Add a public (no sign-in required) About/Onboarding section that explains what the DM Networks project is, how users can interact (sign in with Internet Identity, create/edit profile, post messages in the live chat), and clearly states that the project is managed by DMC Technologies with a clickable link to https://www.dmc-technologies.fr.",
+      "featureId": "feature-update-the-profile-page-public-profile-section-user-facing-labels-to-match-the-new-business-oriented-wording-skills-business-name-programming-languages-slogan-current-projects-business-description-activity-interests-location",
+      "featureTitle": "Update the Profile page (public profile section) user-facing labels to match the new business-oriented wording: Skills → \"Business name\", Programming Languages → \"Slogan\", Current Projects → \"Business Description\", Activity Interests → \"Location\".",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/features/about/AboutPage.tsx"
+        "frontend/src/features/profile/ProfileForm.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -17,15 +16,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-5"
+        "REQ-20"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-the-global-layout-to-surface-dmc-technologies-attribution-consistently-e-g-in-the-footer-while-preserving-existing-branding-links-already-present-in-the-app",
-      "featureTitle": "Update the global layout to surface DMC Technologies attribution consistently (e.g., in the footer) while preserving existing branding links already present in the app.",
+      "featureId": "feature-add-a-new-number-phone-number-field-to-the-user-profile-model-collected-and-saved-from-the-profile-page-when-the-profile-visibility-is-public-and-hidden-cleared-when-visibility-is-private-consistent-with-other-public-only-fields",
+      "featureTitle": "Add a new \"Number\" (phone/number) field to the user profile model, collected and saved from the Profile page when the profile visibility is Public, and hidden/cleared when visibility is Private (consistent with other public-only fields).",
       "files": [
-        "frontend/src/App.tsx"
+        "frontend/src/features/profile/ProfileForm.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -36,7 +35,46 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-6"
+        "REQ-21"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-profile-validation-to-include-the-new-number-field-only-when-visibility-is-public-with-reasonable-constraints-and-an-english-validation-error-message-when-invalid",
+      "featureTitle": "Update profile validation to include the new \"Number\" field (only when visibility is Public) with reasonable constraints and an English validation error message when invalid.",
+      "files": [
+        "frontend/src/features/profile/ProfileForm.tsx",
+        "frontend/src/features/profile/validateProfile.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-22"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-members-directory-ui-to-display-the-renamed-field-labels-for-public-profiles-business-name-slogan-business-description-and-location-only-when-the-corresponding-values-are-present-and-the-viewer-is-allowed-to-see-them-under-existing-visibility-rules",
+      "featureTitle": "Update the Members Directory UI to display the renamed field labels for public profiles: \"Business name\", \"Slogan\", \"Business Description\", and \"Location\" (only when the corresponding values are present and the viewer is allowed to see them under existing visibility rules).",
+      "files": [
+        "frontend/src/features/members/MembersPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-23"
       ],
       "confidence": "high"
     }

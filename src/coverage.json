@@ -1,49 +1,86 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-08T12:07:25.801Z",
+  "generatedAt": "2026-02-08T14:06:10.158Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 5,
+    "implemented": 4,
     "items": [
       {
-        "id": "REQ-5",
-        "summary": "Add a public (no sign-in required) About/Onboarding section that explains what the DM Networks project is, how users can interact (sign in with Internet Identity, create/edit profile, post messages in the live chat), and clearly states that the project is managed by DMC Technologies with a clickable link to https://www.dmc-technologies.fr.",
+        "id": "REQ-20",
+        "summary": "Update the Profile page (public profile section) user-facing labels to match the new business-oriented wording: Skills → \"Business name\", Programming Languages → \"Slogan\", Current Projects → \"Business Description\", Activity Interests → \"Location\".",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/features/about/AboutPage.tsx",
-          "frontend/src/App.tsx"
+          "frontend/src/features/profile/ProfileForm.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/features/about/AboutPage.tsx",
-          "frontend/src/App.tsx"
+          "frontend/src/features/profile/ProfileForm.tsx"
         ]
       },
       {
-        "id": "REQ-6",
-        "summary": "Update the global layout to surface DMC Technologies attribution consistently (e.g., in the footer) while preserving existing branding links already present in the app.",
+        "id": "REQ-21",
+        "summary": "Add a new \"Number\" (phone/number) field to the user profile model, collected and saved from the Profile page when the profile visibility is Public, and hidden/cleared when visibility is Private (consistent with other public-only fields).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/App.tsx"
+          "frontend/src/features/profile/ProfileForm.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/App.tsx"
+          "frontend/src/features/profile/ProfileForm.tsx"
         ]
+      },
+      {
+        "id": "REQ-22",
+        "summary": "Update profile validation to include the new \"Number\" field (only when visibility is Public) with reasonable constraints and an English validation error message when invalid.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/features/profile/validateProfile.ts",
+          "frontend/src/features/profile/ProfileForm.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/features/profile/validateProfile.ts",
+          "frontend/src/features/profile/ProfileForm.tsx"
+        ]
+      },
+      {
+        "id": "REQ-23",
+        "summary": "Update the Members Directory UI to display the renamed field labels for public profiles: \"Business name\", \"Slogan\", \"Business Description\", and \"Location\" (only when the corresponding values are present and the viewer is allowed to see them under existing visibility rules).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/features/members/MembersPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/features/members/MembersPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-24",
+        "summary": "Update backend privacy filtering logic (getUserProfile and getMemberDirectory) to ensure the new number field is treated as public-only data: owner/admin can see it always; other users can see it only when the profile is Public; and it is blanked when returning a Private profile to non-owners.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
-    "build-template/README.md",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
-    "frontend/src/features/about/AboutPage.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/features/members/MembersPage.tsx",
+    "frontend/src/features/profile/ProfileForm.tsx",
+    "frontend/src/features/profile/ProfilePage.tsx",
+    "frontend/src/features/profile/validateProfile.ts",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",
